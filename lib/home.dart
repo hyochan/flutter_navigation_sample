@@ -26,12 +26,21 @@ class _HomeState extends State<Home> {
             const SizedBox(height: 28),
             TextButton(
               child: const Text('설정으로 이동'),
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const Settings(title: '설정'),
-                ),
-              ),
+              // onPressed: () => Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => const Settings(title: '설정'),
+              //   ),
+              // ),
               // onPressed: () => Navigator.of(context).pushNamed('settings'),
+              // onPressed: () => Navigator.of(context).restorablePush(
+              //   (context, arguments) => MaterialPageRoute(
+              //     builder: (context) => const Settings(title: '설정'),
+              //   ),
+              // ),
+              onPressed: () => Navigator.of(context).restorablePushNamed(
+                '/settings',
+                arguments: null,
+              ),
             ),
           ],
         ),
