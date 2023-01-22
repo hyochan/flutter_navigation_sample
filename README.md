@@ -277,7 +277,7 @@
     }
     ```
 
-  - `Typescript`와는 다르게 `dartlang`에는 enum을 매핑해서 사용할 수가 없다. 하지만 Flutter web을 사용한다고 가정하였을 때 해당 route는 `/homeMore`, `/userDetails` 등 `camelCase`로 나타나게 되고 이러한 url 명칭은 개발자들에게 익숙하지 않다. 이런 문제를 `dart`에서는 `C#`에 있는 [extension methods](https://dart.dev/guides/language/extension-methods)를 사용하여 해결 할 수 있다.
+  - `Typescript`와는 다르게 `dartlang`에는 enum을 매핑해서 사용할 수가 없다. 하지만 Flutter web을 사용한다고 가정하였을 때 해당 route는 `/homeMore`, `/userDetails` 등 `camelCase`로 나타나게 되고 이러한 URL 명칭은 개발자들에게 익숙하지 않다. 이런 문제를 `dart`에서는 `C#`에 있는 [extension methods](https://dart.dev/guides/language/extension-methods)를 사용하여 해결 할 수 있다.
 
     ```dart
     extension RouteName on AppRoute {
@@ -442,4 +442,292 @@
     ),
   );
   ```
+</details>
+
+## 2. [go_router](https://pub.dev/packages/go_router)
+
+Flutter navigation 2.0으로 불리는 `go_router`는 Meta에서 일하는 [Chris Sells](https://github.com/csells)가 [go_router 3.0](https://github.com/csells/go_router) 까지 개발하다가 플러터 팀이 공식으로 관리하게 된 프로젝트이다. 2023년 1월 22일 기준으로 [6.0.1까지 버전](https://pub.dev/packages/go_router)이 올라간 상태이다.
+
+### 목차
+
+- [2.1 네비게이션 마이그레이션](https://github.com/hyochan/flutter_navigation_sample/tree/feat/go_router#21-%EB%84%A4%EB%B9%84%EA%B2%8C%EC%9D%B4%EC%85%98-%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98)
+- [2.2 라우터 설정](https://github.com/hyochan/flutter_navigation_sample/tree/feat/go_router#22-%EB%9D%BC%EC%9A%B0%ED%84%B0-%EC%84%A4%EC%A0%95)
+- [2.3 Api 사용](https://github.com/hyochan/flutter_navigation_sample/tree/feat/go_router#23-api-%EC%82%AC%EC%9A%A9)
+- [2.4 제한 사항](https://github.com/hyochan/flutter_navigation_sample/tree/feat/go_router#24-%EC%A0%9C%ED%95%9C-%EC%82%AC%ED%95%AD)
+
+### 2.1 네비게이션 마이그레이션
+
+<details>
+<summary>2.1.1 `go_router` 설치</summary>
+
+```sh
+flutter pub add go_router
+```
+</details>
+
+<details>
+<summary>2.1.2 `MaterialApp`에서 아래 파라미터 제거</summary>
+
+
+~~home: const Home(title: 'Flutter Navigation'),~~
+
+~~initialRoute: 'home',~~
+
+~~routes: {}~~
+</details>
+
+<details>
+<summary>2.1.3 `MaterialApp`을 `MaterialApp.router`로 변경</summary>
+
+
+```dart
+return MaterialApp.router(
+  ...
+```
+
+> 마지막으로 `routerConfig` 파라미터에 라우터를 구성하면 되는데 이는 다음 `2.2`에서 확인한다.
+</details>
+
+### 2.2 라우터 설정
+
+<details>
+<summary>2.2.1 기본 화면 구성</summary>
+
+  우선 화면 전환을 위해 `router_config.dart`에 화면을 구성한다.
+
+  Go router 설정은 `routerConfig` 파라미터를 통해 진행한다. `router_config.dart`를 다음과 같이 구성한다.
+
+  <details>
+  <summary>`router_config.dart`</summary>
+
+  기존에 navigation 1.0에서 `type-safe`하게 라우터를 구성한 것과 같이 `enum`을 활용하고 `GoRoutesName` `extension`를 달아서 라우터를 구성한다.
+
+  ```dart
+  import 'package:flutter/foundation.dart';
+  import 'package:flutter/material.dart';
+  import 'package:flutter_navigation_sample/settings.dart';
+  import 'package:go_router/go_router.dart';
+
+  import '../home.dart';
+
+  final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+  enum GoRoutes {
+    home,
+    settings,
+  }
+
+  extension GoRoutesName on GoRoutes {
+    String get name => describeEnum(this);
+
+    /// Convert to `lower-snake-case` format.
+    String get path {
+      var exp = RegExp(r'(?<=[a-z])[A-Z]');
+      var result =
+          name.replaceAllMapped(exp, (m) => '-${m.group(0)}').toLowerCase();
+      return result;
+    }
+
+    /// Convert to `lower-snake-case` format with `/`.
+    String get fullPath {
+      var exp = RegExp(r'(?<=[a-z])[A-Z]');
+      var result =
+          name.replaceAllMapped(exp, (m) => '-${m.group(0)}').toLowerCase();
+      return '/$result';
+    }
+  }
+
+  final routerConfig = GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: GoRoutes.home.fullPath,
+    errorBuilder: (context, state) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text('Error: ${state.error}'),
+      );
+    },
+    routes: <RouteBase>[
+      GoRoute(
+        name: GoRoutes.home.name,
+        path: GoRoutes.home.fullPath,
+        builder: (context, state) {
+          return const Home();
+        },
+      ),
+      GoRoute(
+        name: GoRoutes.settings.name,
+        path: '${GoRoutes.settings.fullPath}/:title',
+        builder: (context, state) {
+          var args = state.extra as SettingsArguments;
+
+          return Settings(
+            title: state.params['title']!,
+            person: args.person,
+          );
+        },
+      ),
+    ],
+  );
+  ```
+
+  - 선언적으로 화면들을 구성할 수 있는 것이 장점이며 이런 패턴은 [vue router](https://router.vuejs.org)와 유사하다.
+
+  - 명시적으로 `path`에 선언되지 않은 파라미터를 가진 라우터들은 deep link에 제한이 있다.
+  </details>
+</details>
+
+<details>
+<summary>2.2.2 인수가 필요한 화면 구성</summary>
+
+인수가 필요한 화면들을 `router_config.dart`에 구성할 때는 웹 router를 생각하며 구성하면 되는데 대표적으로 `params`, `queryParams`가 있다.
+
+  <details>
+  <summary>2.2.2.1 Params 화면 구성</summary>
+
+  ```dart
+  GoRoute(
+    name: AppRoutes.settings.name,
+    path: '${AppRoutes.settings.fullPath}/:id',
+    builder: (context, state) {
+      var id = state.params['id'] ?? '';
+
+      return Settings(id: id);
+    },
+  ),
+  ```
+  </details>
+
+  <details>
+  <summary>2.2.2.2 Query params 화면 구성</summary>
+
+  ```dart
+  GoRoute(
+    name: AppRoutes.settings.name,
+    path: AppRoutes.settings.fullPath,
+    builder: (context, state) {
+      var id = state.queryParams['id'];
+
+      return Settings(id: id);
+    },
+  ),
+  ```
+  </details>
+
+  <details>
+  <summary>2.2.2.3 Extra param</summary>
+
+  ```dart
+  GoRoute(
+    name: AppRoutes.settings.name,
+    path: AppRoutes.settings.fullPath,
+    builder: (context, state) {
+      var extra = state.extra as SettingsArguments;
+
+      return Settings(title: extra.title, person: extra.person);
+    },
+  ),
+  ```
+
+  > Extra param을 쓰면 정적 URL을 사용할 수 없음에 유의한다.
+  </details>
+
+</details>
+
+### 2.3 Api 사용
+
+Go 라우터를 설치하면 위에서 설명한 `extensions` 방식으로 `BuildContext`에 go 라우터 api들이 추가된다. 따라서 `context`를 이용하여 go 라우터를 사용한다.
+
+
+
+<details>
+<summary>2.3.1 push</summary>
+
+```dart
+context.push(
+  AppRoutes.settings.name,
+);
+```
+
+
+```dart
+context.pushNamed(
+  AppRoutes.settings.name,
+);
+```
+
+  <details>
+  <summary>2.3.1.1 with params</summary>
+
+  ```dart
+  context.push(
+    '${GoRoutes.settings.name}/settings?title=settings',
+    extra: SettingsArguments(title: 'settings', person: person),
+  );
+  ```
+
+  ```dart
+  context.pushNamed(
+    GoRoutes.settings.name,
+    queryParams: {'title': 'settings'},
+    params: { 'title': 'settings' },
+    extra: SettingsArguments(title: '설정', person: person),
+  );
+  ```
+  </details>
+</details>
+
+<details>
+<summary>2.3.2 pop</summary>
+
+```dart
+context.pop();
+```
+</details>
+
+<details>
+<summary>2.3.3 go</summary>
+`replace`와 동일하게 동작한다. 현재 화면을 새로운 링크를 가지는 화면으로 대체한다.
+
+```dart
+context.go(
+  '${GoRoutes.settings.name}/settings?title=settings',
+  extra: SettingsArguments(title: 'settings', person: person),
+);
+```
+
+```dart
+context.goNamed(
+  GoRoutes.settings.name,
+  queryParams: {'title': 'settings'},
+  params: { 'title': 'settings' },
+  extra: SettingsArguments(title: '설정', person: person),
+);
+```
+</details>
+
+
+### 2.4 제한 사항
+
+<details>
+<summary>2.4.1 pop시 결과값 반환</summary>
+
+결과 값을 [1.4.2 변수 반환하기](https://github.com/hyochan/flutter_navigation_sample#14-%EB%84%A4%EB%B9%84%EA%B2%8C%EC%9D%B4%EC%85%98-%EB%B3%80%EC%88%98-%EB%8B%A4%EB%A3%A8%EA%B8%B0)에서 `1.4.2.1 화면으로부터 반환`이 현재 `6.0.1`에서 지원되지 않는다. 따라서 이런 경우 `1.4.2.1 콜백으로 결과 받아오기`를 고려해볼 수 있다.
+
+```dart
+onTapPost: () => context.pushNamed(
+    AppRoutes.reply.name,
+    params: {
+      'id': post.id,
+    },
+    extra: PostArguments(
+      post: post,
+      onPostUpdated: (val) =>
+          context.mounted ? post.value val : null,
+    ),
+);
+```
+
+위와 같이 `extra`에 callback 함수 `onPostUpdated`를 통해서 하위 상태를 변경한다. 하지만 이럴 경우 state 변경 시 unmounted 위젯인지를 확인해주어서 오류를 예방해야 한다. 하지만 보시다시피 `extra`를 사용하기 위해 정적 URL을 사용할 수 없다. 위 제한사항을 해소하기 위해 [go_router_flow](https://pub.dev/packages/go_router_flow) 같은 패키지도 존재한다.
+
+더 나은 대안으로는 React에서 했던 경험처럼 state를 공유해야 하는 위젯들을 `Provider`, `InheritedWidget` 등의 전역 스테이트로 관리하는 것이다.
 </details>
