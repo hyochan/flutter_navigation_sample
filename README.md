@@ -443,3 +443,128 @@
   );
   ```
 </details>
+
+## 2. [go_router](https://pub.dev/packages/go_router)
+
+Flutter navigation 2.0으로 불리는 `go_router`는 Meta에서 일하는 [Chris Sells](https://github.com/csells)가 [go_router 3.0](https://github.com/csells/go_router) 까지 개발하다가 플러터 팀이 공식으로 관리하게 된 프로젝트이다. 2023년 1월 22일 기준으로 [6.0.1까지 버전](https://pub.dev/packages/go_router)이 올라간 상태이다.
+
+### 목차
+
+- [2.1 네비게이션 migration 및 라우터 설정]()
+- [2.3 Api 사용]()
+- [2.4 제한 사항]()
+
+### 2.1
+
+<details>
+<summary>2.1.1 `go_router` 설치</summary>
+
+```sh
+flutter pub add go_router
+```
+</details>
+
+<details>
+<summary>2.1.2 `MaterialApp`에서 아래 파라미터 제거</summary>
+
+
+~~home: const Home(title: 'Flutter Navigation'),~~
+
+~~initialRoute: 'home',~~
+
+~~routes: {}~~
+</details>
+
+<details>
+<summary>2.1.3 `MaterialApp`을 `MaterialApp.router`로 변경</summary>
+
+
+```dart
+return MaterialApp.router(
+  ...
+```
+</details>
+
+<details>
+<summary>2.1.4 `routerConfig` 추가</summary>
+  Go router 설정은 `routerConfig` 파라미터를 통해 진행한다.
+  `router_config.dart`를 다음과 같이 구성한다.
+
+  <details>
+  <summary>`router_config.dart`</summary>
+
+  기존에 navigation 1.0에서 `type-safe`하게 라우터를 구성한 것과 같이 `enum`을 활용하고 `GoRoutesName` `extension`를 달아서 라우터를 구성한다.
+
+  ```dart
+  import 'package:flutter/foundation.dart';
+  import 'package:flutter/material.dart';
+  import 'package:flutter_navigation_sample/settings.dart';
+  import 'package:go_router/go_router.dart';
+
+  import '../home.dart';
+
+  final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+  enum GoRoutes {
+    home,
+    settings,
+  }
+
+  extension GoRoutesName on GoRoutes {
+    String get name => describeEnum(this);
+
+    /// Convert to `lower-snake-case` format.
+    String get path {
+      var exp = RegExp(r'(?<=[a-z])[A-Z]');
+      var result =
+          name.replaceAllMapped(exp, (m) => '-${m.group(0)}').toLowerCase();
+      return result;
+    }
+
+    /// Convert to `lower-snake-case` format with `/`.
+    String get fullPath {
+      var exp = RegExp(r'(?<=[a-z])[A-Z]');
+      var result =
+          name.replaceAllMapped(exp, (m) => '-${m.group(0)}').toLowerCase();
+      return '/$result';
+    }
+  }
+
+  final routerConfig = GoRouter(
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: GoRoutes.home.fullPath,
+    errorBuilder: (context, state) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text('Error: ${state.error}'),
+      );
+    },
+    routes: <RouteBase>[
+      GoRoute(
+        name: GoRoutes.home.name,
+        path: GoRoutes.home.fullPath,
+        builder: (context, state) {
+          return const Home();
+        },
+      ),
+      GoRoute(
+        name: GoRoutes.settings.name,
+        path: '${GoRoutes.settings.fullPath}/:title',
+        builder: (context, state) {
+          var args = state.extra as SettingsArguments;
+
+          return Settings(
+            title: state.params['title']!,
+            person: args.person,
+          );
+        },
+      ),
+    ],
+  );
+  ```
+
+  - 선언적으로 화면들 구성을 할 수 있는 것이 장점이며 이런 패턴은 [vue router](https://router.vuejs.org)와 유사하다.
+
+  - 명시적으로 `path`에 선언되지 않은 파라미터를 가진 라우터들은 deep link에 제한이 있다.
+  </details>
+</details>

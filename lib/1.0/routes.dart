@@ -1,9 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_navigation_sample/exception.dart';
-
-import './home.dart' show Home;
-import './settings.dart' show Settings, SettingsArguments;
+import 'package:flutter_navigation_sample/home.dart';
+import 'package:flutter_navigation_sample/settings.dart';
 
 enum AppRoute {
   home,
@@ -48,5 +48,5 @@ MaterialPageRoute onGenerateRoute(RouteSettings settings) {
     });
   }
 
-  throw NotFoundException(cause: 'Route not found: ${settings.name}');
+  throw PathNotFoundException(settings.name ?? '', const OSError());
 }

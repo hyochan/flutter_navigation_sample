@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_navigation_sample/2.0/router_config.dart';
 import 'package:flutter_navigation_sample/home.dart';
 import 'package:flutter_navigation_sample/settings.dart';
 
 void main() {
-  runApp(const MyApp());
+  // Navigation 1.0
+  // runApp(const MyApp1());
+  runApp(const MyApp2());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+/// Navigation 1.0 sample
+class MyApp2 extends StatelessWidget {
+  const MyApp2({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'Flutter Navigation Sample',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      routerConfig: routerConfig,
+    );
+  }
+}
+
+/// Navigation 1.0 sample
+class MyApp1 extends StatelessWidget {
+  const MyApp1({super.key});
 
   // This widget is the root of your application.
   @override
