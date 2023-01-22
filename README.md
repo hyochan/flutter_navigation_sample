@@ -450,10 +450,10 @@ Flutter navigation 2.0으로 불리는 `go_router`는 Meta에서 일하는 [Chri
 
 ### 목차
 
-- [2.1 네비게이션 마이그레이션]()
-- [2.2 라우터 설정]()
-- [2.3 Api 사용]()
-- [2.4 제한 사항]()
+- [2.1 네비게이션 마이그레이션](https://github.com/hyochan/flutter_navigation_sample/tree/feat/go_router#21-%EB%84%A4%EB%B9%84%EA%B2%8C%EC%9D%B4%EC%85%98-%EB%A7%88%EC%9D%B4%EA%B7%B8%EB%A0%88%EC%9D%B4%EC%85%98)
+- [2.2 라우터 설정](https://github.com/hyochan/flutter_navigation_sample/tree/feat/go_router#22-%EB%9D%BC%EC%9A%B0%ED%84%B0-%EC%84%A4%EC%A0%95)
+- [2.3 Api 사용](https://github.com/hyochan/flutter_navigation_sample/tree/feat/go_router#23-api-%EC%82%AC%EC%9A%A9)
+- [2.4 제한 사항](https://github.com/hyochan/flutter_navigation_sample/tree/feat/go_router#24-%EC%A0%9C%ED%95%9C-%EC%82%AC%ED%95%AD)
 
 ### 2.1 네비게이션 마이그레이션
 
