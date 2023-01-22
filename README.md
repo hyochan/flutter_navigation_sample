@@ -6,14 +6,12 @@
 
 ### 목차
 
-<ul>
-  <li>1.1 네비게이션 사용</li>
-  <li>1.2 기본적인 기능들 (push, pop, etc)</li>
-  <li>1.3 복원 가능한 네비게이션</li>
-  <li>1.4 네비게이션 변수 다루기</li>
-  <li>1.5 미비한 기능 (navigate)</li>
-  <li>1.6 실사용 예시</li>
-</ul>
+- [1.1 네비게이션 사용](https://github.com/hyochan/flutter_navigation_sample#11-%EB%84%A4%EB%B9%84%EA%B2%8C%EC%9D%B4%EC%85%98-%EC%82%AC%EC%9A%A9)
+- [1.2 기본적인 기능들 (push, pop, etc)](https://github.com/hyochan/flutter_navigation_sample#12-%EA%B8%B0%EB%B3%B8%EC%A0%81%EC%9D%B8-%EA%B8%B0%EB%8A%A5%EB%93%A4)
+- [1.3 복원 가능한 네비게이션](https://github.com/hyochan/flutter_navigation_sample#13-%EB%B3%B5%EC%9B%90-%EA%B0%80%EB%8A%A5%ED%95%9C-%EB%84%A4%EB%B9%84%EA%B2%8C%EC%9D%B4%EC%85%98)
+- [1.4 네비게이션 변수 다루기](https://github.com/hyochan/flutter_navigation_sample#14-%EB%84%A4%EB%B9%84%EA%B2%8C%EC%9D%B4%EC%85%98-%EB%B3%80%EC%88%98-%EB%8B%A4%EB%A3%A8%EA%B8%B0)
+- [1.5 미비한 기능 (navigate)](https://github.com/hyochan/flutter_navigation_sample#15-%EB%AF%B8%EB%B9%84%ED%95%9C-%EA%B8%B0%EB%8A%A5)
+- [1.6 실사용 예시](https://github.com/hyochan/flutter_navigation_sample#16-%EC%8B%A4%EC%82%AC%EC%9A%A9-%EC%98%88%EC%8B%9C)
 
 ### 1.1 네비게이션 사용
 
