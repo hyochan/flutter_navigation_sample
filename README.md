@@ -450,11 +450,12 @@ Flutter navigation 2.0으로 불리는 `go_router`는 Meta에서 일하는 [Chri
 
 ### 목차
 
-- [2.1 네비게이션 migration 및 라우터 설정]()
+- [2.1 네비게이션 마이그레이션]()
+- [2.2 라우터 설정]()
 - [2.3 Api 사용]()
 - [2.4 제한 사항]()
 
-### 2.1
+### 2.1 네비게이션 마이그레이션
 
 <details>
 <summary>2.1.1 `go_router` 설치</summary>
@@ -483,12 +484,18 @@ flutter pub add go_router
 return MaterialApp.router(
   ...
 ```
+
+> 마지막으로 `routerConfig` 파라미터에 라우터를 구성하면 되는데 이는 다음 `2.2`에서 확인한다.
 </details>
 
+### 2.2 라우터 설정
+
 <details>
-<summary>2.1.4 `routerConfig` 추가</summary>
-  Go router 설정은 `routerConfig` 파라미터를 통해 진행한다.
-  `router_config.dart`를 다음과 같이 구성한다.
+<summary>2.2.1 기본 화면 구성</summary>
+
+  우선 화면 전환을 위해 `router_config.dart`에 화면을 구성한다.
+
+  Go router 설정은 `routerConfig` 파라미터를 통해 진행한다. `router_config.dart`를 다음과 같이 구성한다.
 
   <details>
   <summary>`router_config.dart`</summary>
@@ -563,8 +570,69 @@ return MaterialApp.router(
   );
   ```
 
-  - 선언적으로 화면들 구성을 할 수 있는 것이 장점이며 이런 패턴은 [vue router](https://router.vuejs.org)와 유사하다.
+  - 선언적으로 화면들을 구성할 수 있는 것이 장점이며 이런 패턴은 [vue router](https://router.vuejs.org)와 유사하다.
 
   - 명시적으로 `path`에 선언되지 않은 파라미터를 가진 라우터들은 deep link에 제한이 있다.
   </details>
 </details>
+
+<details>
+<summary>2.2.2 인수가 필요한 화면 구성</summary>
+
+인수가 필요한 화면들을 `router_config.dart`에 구성할 때는 웹 router를 생각하며 구성하면 되는데 대표적으로 `params`, `queryParams`가 있다.
+
+  <details>
+  <summary>2.2.2.1 Params 화면 구성</summary>
+
+  ```dart
+  GoRoute(
+    name: AppRoutes.settings.name,
+    path: '${AppRoutes.settings.fullPath}/:id',
+    builder: (context, state) {
+      var id = state.params['id'] ?? '';
+
+      return Settings(id: id);
+    },
+  ),
+  ```
+  </details>
+
+  <details>
+  <summary>2.2.2.2 Query params 화면 구성</summary>
+
+  ```dart
+  GoRoute(
+    name: AppRoutes.settings.name,
+    path: AppRoutes.settings.fullPath,
+    builder: (context, state) {
+      var id = state.queryParams['id'];
+
+      return Settings(id: id);
+    },
+  ),
+  ```
+  </details>
+
+  <details>
+  <summary>2.2.2.3 Extra param</summary>
+
+  ```dart
+  GoRoute(
+    name: AppRoutes.settings.name,
+    path: AppRoutes.settings.fullPath,
+    builder: (context, state) {
+      var extra = state.extra as SettingsArguments;
+
+      return Settings(title: extra.title, person: extra.person);
+    },
+  ),
+  ```
+
+  > Extra param을 쓰면 정적 라우팅에는 사용할 수 없음을 유의한다.
+  </details>
+
+</details>
+
+### 2.3 Api 사용
+
+### 2.4 제한 사항
