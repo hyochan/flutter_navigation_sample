@@ -47,14 +47,14 @@
 
   ```dart
   Navigator.of(context).push(
-    MaterialPageRoute우
+    MaterialPageRoute(
       builder: (context) => const Settings(title: '설정'),
     ),
   );
   ```
 
   <details>
-  <summary><span style="color: #47498A">Named route</span></summary>
+  <summary>Named route</summary>
 
   ```dart
   Navigator.of(context).pushNamed('settings', arguments: null);
@@ -107,7 +107,7 @@
   ```
 
   <details>
-  <summary><span style="color: #47498A">Named route</span></summary>
+  <summary>Named route</summary>
 
   ```dart
   Navigator.of(context).pushReplacementNamed('/$routeName', arguments: arguments);
@@ -133,7 +133,7 @@
   ```
 
   <details>
-  <summary><span style="color: #47498A">Named route</span></summary>
+  <summary>Named route</summary>
 
   ```dart
   Navigator.of(context).restorablePushNamed(
