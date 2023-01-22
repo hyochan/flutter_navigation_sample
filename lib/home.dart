@@ -68,6 +68,10 @@ class _HomeState extends State<Home> {
               // ),
 
               /// go_router
+              // onPressed: () => context.push(
+              //   GoRoutes.settings.name,
+              //   extra: SettingsArguments(title: '설정', person: person),
+              // ),
               onPressed: () => context.pushNamed(
                 GoRoutes.settings.name,
                 queryParams: {'title': '설정'},

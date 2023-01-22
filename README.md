@@ -277,7 +277,7 @@
     }
     ```
 
-  - `Typescript`와는 다르게 `dartlang`에는 enum을 매핑해서 사용할 수가 없다. 하지만 Flutter web을 사용한다고 가정하였을 때 해당 route는 `/homeMore`, `/userDetails` 등 `camelCase`로 나타나게 되고 이러한 url 명칭은 개발자들에게 익숙하지 않다. 이런 문제를 `dart`에서는 `C#`에 있는 [extension methods](https://dart.dev/guides/language/extension-methods)를 사용하여 해결 할 수 있다.
+  - `Typescript`와는 다르게 `dartlang`에는 enum을 매핑해서 사용할 수가 없다. 하지만 Flutter web을 사용한다고 가정하였을 때 해당 route는 `/homeMore`, `/userDetails` 등 `camelCase`로 나타나게 되고 이러한 URL 명칭은 개발자들에게 익숙하지 않다. 이런 문제를 `dart`에서는 `C#`에 있는 [extension methods](https://dart.dev/guides/language/extension-methods)를 사용하여 해결 할 수 있다.
 
     ```dart
     extension RouteName on AppRoute {
@@ -628,11 +628,106 @@ return MaterialApp.router(
   ),
   ```
 
-  > Extra param을 쓰면 정적 라우팅에는 사용할 수 없음을 유의한다.
+  > Extra param을 쓰면 정적 URL을 사용할 수 없음에 유의한다.
   </details>
 
 </details>
 
 ### 2.3 Api 사용
 
+Go 라우터를 설치하면 위에서 설명한 `extensions` 방식으로 `BuildContext`에 go 라우터 api들이 추가된다. 따라서 `context`를 이용하여 go 라우터를 사용한다.
+
+
+
+<details>
+<summary>2.3.1 push</summary>
+
+```dart
+context.push(
+  AppRoutes.settings.name,
+);
+```
+
+
+```dart
+context.pushNamed(
+  AppRoutes.settings.name,
+);
+```
+
+  <details>
+  <summary>2.3.1.1 with params</summary>
+
+  ```dart
+  context.push(
+    '${GoRoutes.settings.name}/settings?title=settings',
+    extra: SettingsArguments(title: 'settings', person: person),
+  );
+  ```
+
+  ```dart
+  context.pushNamed(
+    GoRoutes.settings.name,
+    queryParams: {'title': 'settings'},
+    params: { 'title': 'settings' },
+    extra: SettingsArguments(title: '설정', person: person),
+  );
+  ```
+  </details>
+</details>
+
+<details>
+<summary>2.3.2 pop</summary>
+
+```dart
+context.pop();
+```
+</details>
+
+<details>
+<summary>2.3.3 go</summary>
+`replace`와 동일하게 동작한다. 현재 화면을 새로운 링크를 가지는 화면으로 대체한다.
+
+```dart
+context.go(
+  '${GoRoutes.settings.name}/settings?title=settings',
+  extra: SettingsArguments(title: 'settings', person: person),
+);
+```
+
+```dart
+context.goNamed(
+  GoRoutes.settings.name,
+  queryParams: {'title': 'settings'},
+  params: { 'title': 'settings' },
+  extra: SettingsArguments(title: '설정', person: person),
+);
+```
+</details>
+
+
 ### 2.4 제한 사항
+
+<details>
+<summary>2.4.1 pop시 결과값 반환</summary>
+
+결과 값을 [1.4.2 변수 반환하기](https://github.com/hyochan/flutter_navigation_sample#14-%EB%84%A4%EB%B9%84%EA%B2%8C%EC%9D%B4%EC%85%98-%EB%B3%80%EC%88%98-%EB%8B%A4%EB%A3%A8%EA%B8%B0)에서 `1.4.2.1 화면으로부터 반환`이 현재 `6.0.1`에서 지원되지 않는다. 따라서 이런 경우 `1.4.2.1 콜백으로 결과 받아오기`를 고려해볼 수 있다.
+
+```dart
+onTapPost: () => context.pushNamed(
+    AppRoutes.reply.name,
+    params: {
+      'id': post.id,
+    },
+    extra: PostArguments(
+      post: post,
+      onPostUpdated: (val) =>
+          context.mounted ? post.value val : null,
+    ),
+);
+```
+
+위와 같이 `extra`에 callback 함수 `onPostUpdated`를 통해서 하위 상태를 변경한다. 하지만 이럴 경우 state 변경 시 unmounted 위젯인지를 확인해주어서 오류를 예방해야 한다. 하지만 보시다시피 `extra`를 사용하기 위해 정적 URL을 사용할 수 없다. 위 제한사항을 해소하기 위해 [go_router_flow](https://pub.dev/packages/go_router_flow) 같은 패키지도 존재한다.
+
+더 나은 대안으로는 React에서 했던 경험처럼 state를 공유해야 하는 위젯들을 `Provider`, `InheritedWidget` 등의 전역 스테이트로 관리하는 것이다.
+</details>
