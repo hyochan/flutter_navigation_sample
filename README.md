@@ -722,7 +722,7 @@ onTapPost: () => context.pushNamed(
     extra: PostArguments(
       post: post,
       onPostUpdated: (val) =>
-          context.mounted ? post.value val : null,
+          context.mounted ? post.value = val : null,
     ),
 );
 ```
